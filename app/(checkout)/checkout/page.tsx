@@ -1,16 +1,34 @@
+"use client";
 import {
+  CheckoutItem,
   CheckoutItemDetails,
   Container,
   Title,
   WhiteBlock,
 } from "@/shared/components/shared";
+import { CheckoutCart } from "@/shared/components/shared/checkout-cart";
 import { Button, Input, Textarea } from "@/shared/components/ui";
+import { PizzaSize, PizzaType } from "@/shared/constants/pizza";
+import { useCart } from "@/shared/hooks";
+import { getCartItemDetails } from "@/shared/lib";
 import { ArrowRight, Package, Percent, Truck } from "lucide-react";
 import React from "react";
 
 type Props = {};
 
 const CheckoutPage = (props: Props) => {
+  const { totalAmount, updateItemQuantity, items, removeCartItem, loading } =
+    useCart();
+
+  const onUpdateQuantity = async (
+    id: number,
+    quantity: number,
+    type: "minus" | "plus"
+  ) => {
+    const newQuantity = type === "minus" ? quantity - 1 : quantity + 1;
+    await updateItemQuantity(id, newQuantity);
+    // fetchCartItems();
+  };
   return (
     <Container>
       <Title
@@ -20,7 +38,13 @@ const CheckoutPage = (props: Props) => {
       <div className="flex gap-10">
         {/* Cep tarap */}
         <div className="flex flex-col gap-10 flex-1 mb-20">
-          <WhiteBlock title="1.Корзина">213123</WhiteBlock>
+          <CheckoutCart
+            onClickCountButton={onUpdateQuantity}
+            removeCartItem={removeCartItem}
+            items={items}
+            loading={loading}
+          />
+
           <WhiteBlock title="2. Персональные данные">
             <div className="grid grid-cols-2 gap-5">
               <Input name="firstName" className="text-base" placeholder="Имя" />
@@ -53,7 +77,9 @@ const CheckoutPage = (props: Props) => {
           <WhiteBlock className="p-6 sticky top-4">
             <div className="flex flex-col gap-1">
               <span className="text-xl ">Итого:</span>
-              <span className="text-[34px] font-extrabold">450 $</span>
+              <span className="text-[34px] font-extrabold">
+                {totalAmount} $
+              </span>
             </div>
 
             <CheckoutItemDetails

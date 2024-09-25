@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "../ui";
 import { ArrowRight, ShoppingCart } from "lucide-react";
-import { CardDrawer } from "./card-drawer";
+import { CartDrawer } from "./card-drawer";
 import { useCartStore } from "@/shared/store";
 import { cn } from "@/shared/lib/utils";
 
@@ -15,7 +15,7 @@ export const CardButton: React.FC<Props> = ({}) => {
     state.loading,
   ]);
   return (
-    <CardDrawer>
+    <CartDrawer>
       <Button
         loading={loading}
         className={cn("group relative", { "w-[105px]": loading })}
@@ -35,6 +35,6 @@ export const CardButton: React.FC<Props> = ({}) => {
           className="absolute right-5 transition duration-300 -translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0"
         />
       </Button>
-    </CardDrawer>
+    </CartDrawer>
   );
 };

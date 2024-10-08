@@ -12,8 +12,11 @@ import { useForm, SubmitHandler, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { CheckoutFormSchema, CheckoutFormValues } from "@/shared/constants";
+import { createOrder } from "@/app/actions";
+import toast from "react-hot-toast";
 
 const CheckoutPage = () => {
+  const [submitting, setSubmitting] = React.useState(false);
   const { totalAmount, updateItemQuantity, items, removeCartItem, loading } =
     useCart();
 
@@ -29,9 +32,30 @@ const CheckoutPage = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<CheckoutFormValues> = (data) => {
-    console.log(data);
+  const onSubmit = async (data: CheckoutFormValues) => {
+    try {
+      setSubmitting(true);
+
+      const url = await createOrder(data);
+
+      toast.error("Заказ успешно оформлен! 📝 Переход на оплату... ", {
+        icon: "✅",
+      });
+
+      if (url) {
+        location.href = url;
+      }
+    } catch (err) {
+      console.log(err);
+      setSubmitting(false);
+      toast.error("Не удалось создать заказ", {
+        icon: "❌",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
+
   const onUpdateQuantity = (
     id: number,
     quantity: number,
@@ -58,12 +82,19 @@ const CheckoutPage = () => {
                 items={items}
                 loading={loading}
               />
-              <CheckoutPersonalForm />
-              <CheckoutAdresForm />
+              <CheckoutPersonalForm
+                className={loading ? "opacity-40 pointer-events-none" : ""}
+              />
+              <CheckoutAdresForm
+                className={loading ? "opacity-40 pointer-events-none" : ""}
+              />
             </div>
 
             {/* sag tarap */}
-            <CheckoutSidebar totalAmount={totalAmount} loading={loading} />
+            <CheckoutSidebar
+              totalAmount={totalAmount}
+              loading={loading || submitting}
+            />
           </div>
         </form>
       </FormProvider>

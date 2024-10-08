@@ -23,7 +23,9 @@ export const CheckoutSidebar: React.FC<Props> = ({ totalAmount, loading }) => {
           {loading ? (
             <Skeleton className="w-48 h-11" />
           ) : (
-            <span className="text-[34px] font-extrabold">{totalPrice}$ </span>
+            <span className="text-[34px] font-extrabold h-11">
+              {totalPrice}${" "}
+            </span>
           )}
         </div>
 
@@ -35,7 +37,11 @@ export const CheckoutSidebar: React.FC<Props> = ({ totalAmount, loading }) => {
             </div>
           }
           value={
-            loading ? <Skeleton className="w-48 h-11" /> : `${totalAmount} `
+            loading ? (
+              <Skeleton className="h-6 w-16 rounded-[6px]" />
+            ) : (
+              `${totalAmount} `
+            )
           }
         />
         <CheckoutItemDetails
@@ -45,7 +51,13 @@ export const CheckoutSidebar: React.FC<Props> = ({ totalAmount, loading }) => {
               Налоги:
             </div>
           }
-          value={`${vatPrice} `}
+          value={
+            loading ? (
+              <Skeleton className="h-6 w-16 rounded-[6px]" />
+            ) : (
+              `${vatPrice} `
+            )
+          }
         />
         <CheckoutItemDetails
           title={
@@ -54,11 +66,17 @@ export const CheckoutSidebar: React.FC<Props> = ({ totalAmount, loading }) => {
               Доставка:
             </div>
           }
-          value={`${DELIVERY_PRICE} `}
+          value={
+            loading ? (
+              <Skeleton className="h-6 w-16 rounded-[6px]" />
+            ) : (
+              `${DELIVERY_PRICE} `
+            )
+          }
         />
 
         <Button
-          // loading={loading}
+          loading={loading}
           type="submit"
           className="w-full h-14 rounded-2xl mt-6 text-base font-bold"
         >

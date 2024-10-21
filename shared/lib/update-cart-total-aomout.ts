@@ -1,5 +1,5 @@
-import { prisma } from "@/prisma/prisma-client"
-import { calcCartItemTotalPrice } from "./calc-cart-item-total-price";
+import { prisma } from '@/prisma/prisma-client';
+import { calcCartItemTotalPrice } from './calc-cart-item-total-price';
 
 export const updateCartTotalAmount = async (token: string) => {
     const userCart = await prisma.cart.findFirst({
@@ -9,49 +9,49 @@ export const updateCartTotalAmount = async (token: string) => {
         include: {
             items: {
                 orderBy: {
-                    id: 'desc'
+                    createdAt: 'desc',
                 },
                 include: {
                     productItem: {
                         include: {
-                            product: true
-                        }
+                            product: true,
+                        },
                     },
-                    ingredients: true
-                }
+                    ingredients: true,
+                },
             },
-        }
+        },
     });
+
     if (!userCart) {
-        return
+        return;
     }
+
     const totalAmount = userCart.items.reduce((acc, item) => {
         return acc + calcCartItemTotalPrice(item);
-    }, 0)
+    }, 0);
 
     return await prisma.cart.update({
         where: {
             id: userCart.id,
         },
         data: {
-            totalAmount
+            totalAmount,
         },
         include: {
             items: {
                 orderBy: {
-                    id: 'desc'
+                    createdAt: 'desc',
                 },
                 include: {
                     productItem: {
                         include: {
-                            product: true
-                        }
+                            product: true,
+                        },
                     },
-                    ingredients: true
-                }
+                    ingredients: true,
+                },
             },
-        }
-
-
-    })
-}
+        },
+    });
+};

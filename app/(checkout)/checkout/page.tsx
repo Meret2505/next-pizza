@@ -14,9 +14,12 @@ import React from "react";
 import { CheckoutFormSchema, CheckoutFormValues } from "@/shared/constants";
 import { createOrder } from "@/app/actions";
 import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
+import { Api } from "@/shared/services/api-client";
 
 const CheckoutPage = () => {
   const [submitting, setSubmitting] = React.useState(false);
+  const { data: session } = useSession();
   const { totalAmount, updateItemQuantity, items, removeCartItem, loading } =
     useCart();
 
@@ -32,6 +35,15 @@ const CheckoutPage = () => {
     },
   });
 
+  React.useEffect(() => {
+    async function fetchUserInfo() {
+      const data = await Api.auth.getMe();
+      const [firstName, lastName] = data.fullName.split(" ");
+    }
+    if (session) {
+      fetchUserInfo();
+    }
+  }, [session]);
   const onSubmit = async (data: CheckoutFormValues) => {
     try {
       setSubmitting(true);
@@ -64,7 +76,6 @@ const CheckoutPage = () => {
     const newQuantity = type === "minus" ? quantity - 1 : quantity + 1;
     updateItemQuantity(id, newQuantity);
   };
-
   return (
     <Container>
       <Title

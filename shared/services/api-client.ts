@@ -1,9 +1,12 @@
 import * as products from './product'
 import * as ingredients from './ingredients'
 import * as cart from './cart'
+import * as auth from './auth'
+import * as stories from './stories'
 export const Api = {
     products,
     ingredients,
-    cart
-
+    cart,
+    auth,
+    stories
 }

@@ -1,34 +1,36 @@
 "use client";
+
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import {
-  CheckoutCart,
   CheckoutSidebar,
   Container,
   Title,
+  CheckoutAddressForm,
+  CheckoutCart,
   CheckoutPersonalForm,
-  CheckoutAdresForm,
 } from "@/shared/components/shared";
+import { CheckoutFormValues, checkoutFormSchema } from "@/shared/constants";
 import { useCart } from "@/shared/hooks";
-import { useForm, SubmitHandler, FormProvider } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
-import { CheckoutFormSchema, CheckoutFormValues } from "@/shared/constants";
 import { createOrder } from "@/app/actions";
 import toast from "react-hot-toast";
+import React from "react";
 import { useSession } from "next-auth/react";
 import { Api } from "@/shared/services/api-client";
 
-const CheckoutPage = () => {
+export default function CheckoutPage() {
   const [submitting, setSubmitting] = React.useState(false);
-  const { data: session } = useSession();
   const { totalAmount, updateItemQuantity, items, removeCartItem, loading } =
     useCart();
+  const { data: session } = useSession();
 
   const form = useForm<CheckoutFormValues>({
-    resolver: zodResolver(CheckoutFormSchema),
+    resolver: zodResolver(checkoutFormSchema),
     defaultValues: {
+      email: "",
       firstName: "",
       lastName: "",
-      email: "",
       phone: "",
       address: "",
       comment: "",
@@ -39,11 +41,17 @@ const CheckoutPage = () => {
     async function fetchUserInfo() {
       const data = await Api.auth.getMe();
       const [firstName, lastName] = data.fullName.split(" ");
+
+      form.setValue("firstName", firstName);
+      form.setValue("lastName", lastName);
+      form.setValue("email", data.email);
     }
+
     if (session) {
       fetchUserInfo();
     }
   }, [session]);
+
   const onSubmit = async (data: CheckoutFormValues) => {
     try {
       setSubmitting(true);
@@ -63,54 +71,56 @@ const CheckoutPage = () => {
       toast.error("Не удалось создать заказ", {
         icon: "❌",
       });
-    } finally {
-      setSubmitting(false);
     }
   };
 
-  const onUpdateQuantity = (
+  const onClickCountButton = (
     id: number,
     quantity: number,
-    type: "minus" | "plus"
+    type: "plus" | "minus"
   ) => {
-    const newQuantity = type === "minus" ? quantity - 1 : quantity + 1;
+    const newQuantity = type === "plus" ? quantity + 1 : quantity - 1;
     updateItemQuantity(id, newQuantity);
   };
+
   return (
-    <Container>
+    <Container className="mt-10">
       <Title
         text="Оформление заказа"
-        className="font-extrabold mb-8 text-[28px] mt-4"
+        className="font-extrabold mb-8 text-[36px]"
       />
+
       <FormProvider {...form}>
-        <form action="" onSubmit={form.handleSubmit(onSubmit)}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex gap-10">
-            {/* Cep tarap */}
+            {/* Левая часть */}
             <div className="flex flex-col gap-10 flex-1 mb-20">
               <CheckoutCart
-                onClickCountButton={onUpdateQuantity}
+                onClickCountButton={onClickCountButton}
                 removeCartItem={removeCartItem}
                 items={items}
                 loading={loading}
               />
+
               <CheckoutPersonalForm
                 className={loading ? "opacity-40 pointer-events-none" : ""}
               />
-              <CheckoutAdresForm
+
+              <CheckoutAddressForm
                 className={loading ? "opacity-40 pointer-events-none" : ""}
               />
             </div>
 
-            {/* sag tarap */}
-            <CheckoutSidebar
-              totalAmount={totalAmount}
-              loading={loading || submitting}
-            />
+            {/* Правая часть */}
+            <div className="w-[450px]">
+              <CheckoutSidebar
+                totalAmount={totalAmount}
+                loading={loading || submitting}
+              />
+            </div>
           </div>
         </form>
       </FormProvider>
     </Container>
   );
-};
-
-export default CheckoutPage;
+}

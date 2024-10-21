@@ -1,18 +1,19 @@
+"use client";
 import React from "react";
-import { WhiteBlock } from "../white-block";
-import { FormTextarea } from "../form";
-import { AddressInput } from "../address-input";
+import { WhiteBlock } from "./white-block";
+import { FormTextarea } from "./form";
+import { AddressInput } from "./address-input";
 import {
   Controller as Controller,
   useFormContext as useFormContext,
 } from "react-hook-form";
-import { ErrorText } from "../error-text";
+import { ErrorText } from "./error-text";
 
 interface Props {
   className?: string;
 }
 
-export const CheckoutAdresForm: React.FC<Props> = ({ className }) => {
+export const CheckoutAddressForm: React.FC<Props> = ({ className }) => {
   const { control } = useFormContext();
   return (
     <WhiteBlock title="3. Адрес доставки">
